@@ -5,21 +5,263 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hawaji</title>
 <style>
-body{margin:0;font-family:system-ui,sans-serif;background:#111;color:#f0b90b;padding:16px}
-h1{text-align:center;margin:8px 0 20px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,sans-serif;background:#111;color:#f0b90b;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #2a2412}
+h1{font-size:22px;margin:0;color:#ffe14d}
+.langs button{padding:6px 10px;margin:0 2px;border-radius:10px;border:1px solid #b8923a;background:#1b1b1b;color:#f0b90b;font-size:13px}
+.langs button.on{background:#f0b90b;color:#111}
+main{padding:14px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{padding:18px 8px;border-radius:14px;border:1px solid #b8923a;background:#1b1b1b;color:#f0b90b;font-size:16px}
+.tile{padding:22px 8px;border-radius:16px;border:1px solid #b8923a;background:#1b1b1b;color:#f0b90b;font-size:16px}
+.back{margin-bottom:12px;padding:8px 14px;border-radius:12px;border:1px solid #b8923a;background:#1b1b1b;color:#f0b90b}
+.panel{display:none}
+.panel.on{display:block}
+h2{color:#ffe14d;font-size:19px;margin:6px 0 12px}
+input,select,textarea{width:100%;padding:12px;margin:5px 0;border-radius:12px;border:1px solid #3a3320;background:#171717;color:#fff;font-size:16px}
+textarea{min-height:120px}
+.btn{padding:12px 16px;margin:5px 4px 5px 0;border-radius:12px;border:0;background:#f0b90b;color:#111;font-weight:700;font-size:15px}
+.btn.g{background:#2a2412;color:#f0b90b;border:1px solid #b8923a}
+.out{font-size:26px;text-align:center;padding:14px;margin-top:10px;color:#ffe14d;word-break:break-all}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #2a2412}
+.item span{flex:1;font-size:16px}
+.item.done span{text-decoration:line-through;opacity:.5}
+.big{font-size:44px;text-align:center;font-variant-numeric:tabular-nums;margin:14px 0}
+.note{font-size:13px;opacity:.7}
 </style>
 </head>
 <body>
-<h1>Hawaji</h1>
-<div class="grid">
-  <button>الحاسبة</button>
-  <button>النسبة المئوية</button>
-  <button>تحويل الوحدات</button>
-  <button>المؤقت</button>
-  <button>المهام</button>
-  <button>القرعة</button>
-</div>
+<header>
+  <h1>Hawaji</h1>
+  <div class="langs">
+    <button data-lang="ar">ع</button><button data-lang="en">EN</button><button data-lang="fr">FR</button>
+  </div>
+</header>
+<main>
+  <div id="home" class="grid">
+    <button class="tile" data-tool="calc"></button>
+    <button class="tile" data-tool="pct"></button>
+    <button class="tile" data-tool="conv"></button>
+    <button class="tile" data-tool="timer"></button>
+    <button class="tile" data-tool="todo"></button>
+    <button class="tile" data-tool="draw"></button>
+  </div>
+
+  <div id="calc" class="panel">
+    <button class="back" data-back></button>
+    <h2 data-k="calc"></h2>
+    <input id="calcIn" inputmode="decimal" placeholder="">
+    <div class="row">
+      <button class="btn" id="calcGo"></button>
+      <button class="btn g" id="calcClr"></button>
+    </div>
+    <div class="out" id="calcOut">0</div>
+  </div>
+
+  <div id="pct" class="panel">
+    <button class="back" data-back></button>
+    <h2 data-k="pct"></h2>
+    <div class="note" data-k="pctA"></div>
+    <div class="row"><input id="pA" inputmode="decimal"><input id="pB" inputmode="decimal"></div>
+    <button class="btn" id="pGo1"></button>
+    <button class="btn" id="pGo2"></button>
+    <button class="btn" id="pGo3"></button>
+    <div class="out" id="pOut"></div>
+  </div>
+
+  <div id="conv" class="panel">
+    <button class="back" data-back></button>
+    <h2 data-k="conv"></h2>
+    <select id="cCat"></select>
+    <div class="row"><select id="cFrom"></select><select id="cTo"></select></div>
+    <input id="cVal" inputmode="decimal">
+    <div class="out" id="cOut"></div>
+  </div>
+
+  <div id="timer" class="panel">
+    <button class="back" data-back></button>
+    <h2 data-k="timer"></h2>
+    <div class="row"><input id="tMin" inputmode="numeric" value="5"><input id="tSec" inputmode="numeric" value="0"></div>
+    <div class="big" id="tDisp">00:00</div>
+    <div class="row">
+      <button class="btn" id="tStart"></button>
+      <button class="btn g" id="tReset"></button>
+    </div>
+  </div>
+
+  <div id="todo" class="panel">
+    <button class="back" data-back></button>
+    <h2 data-k="todo"></h2>
+    <div class="row"><input id="tdIn"><button class="btn" id="tdAdd"></button></div>
+    <div id="tdList"></div>
+  </div>
+
+  <div id="draw" class="panel">
+    <button class="back" data-back></button>
+    <h2 data-k="draw"></h2>
+    <textarea id="dNames"></textarea>
+    <button class="btn" id="dGo"></button>
+    <div class="out" id="dOut"></div>
+  </div>
+</main>
+
+<script>
+var T={
+ar:{title:'حوائجي',back:'رجوع',calc:'الحاسبة',pct:'النسبة المئوية',conv:'تحويل الوحدات',timer:'المؤقت',todo:'المهام',draw:'القرعة',
+go:'احسب',clr:'مسح',calcPh:'مثال: (5+3)*2',pctA:'أدخل رقمين ثم اختر العملية',p1:'كم يساوي % من',p2:'كم % هو من',p3:'زيادة/نقص % على',
+cat:'الفئة',len:'الطول',wt:'الوزن',tmp:'الحرارة',val:'القيمة',start:'ابدأ',pause:'إيقاف',reset:'إعادة',done:'انتهى الوقت!',
+add:'إضافة',tdPh:'اكتب مهمة...',dPh:'اكتب الأسماء، اسماً في كل سطر',dGo:'اختر عشوائياً',win:'الفائز:',empty:'أضف أسماء أولاً',
+m:'متر',km:'كيلومتر',cm:'سنتيمتر',mi:'ميل',ft:'قدم',kg:'كيلوغرام',g:'غرام',lb:'باوند',oz:'أونصة',c:'مئوية',f:'فهرنهايت',k:'كلفن'},
+en:{title:'Hawaji',back:'Back',calc:'Calculator',pct:'Percentage',conv:'Converter',timer:'Timer',todo:'To-do',draw:'Draw',
+go:'Calculate',clr:'Clear',calcPh:'e.g. (5+3)*2',pctA:'Enter two numbers, then pick an action',p1:'What is % of',p2:'What % is',p3:'Increase/decrease % of',
+cat:'Category',len:'Length',wt:'Weight',tmp:'Temperature',val:'Value',start:'Start',pause:'Pause',reset:'Reset',done:'Time is up!',
+add:'Add',tdPh:'Write a task...',dPh:'Write names, one per line',dGo:'Pick randomly',win:'Winner:',empty:'Add names first',
+m:'meter',km:'kilometer',cm:'centimeter',mi:'mile',ft:'foot',kg:'kilogram',g:'gram',lb:'pound',oz:'ounce',c:'Celsius',f:'Fahrenheit',k:'Kelvin'},
+fr:{title:'Hawaji',back:'Retour',calc:'Calculatrice',pct:'Pourcentage',conv:'Convertisseur',timer:'Minuteur',todo:'Tâches',draw:'Tirage',
+go:'Calculer',clr:'Effacer',calcPh:'ex. (5+3)*2',pctA:'Entrez deux nombres, puis choisissez',p1:'Combien vaut % de',p2:'Quel % est',p3:'Hausse/baisse de %',
+cat:'Catégorie',len:'Longueur',wt:'Poids',tmp:'Température',val:'Valeur',start:'Démarrer',pause:'Pause',reset:'Réinitialiser',done:'Temps écoulé !',
+add:'Ajouter',tdPh:'Écrivez une tâche...',dPh:'Écrivez les noms, un par ligne',dGo:'Choisir au hasard',win:'Gagnant :',empty:'Ajoutez d\'abord des noms',
+m:'mètre',km:'kilomètre',cm:'centimètre',mi:'mille',ft:'pied',kg:'kilogramme',g:'gramme',lb:'livre',oz:'once',c:'Celsius',f:'Fahrenheit',k:'Kelvin'}
+};
+var lang=localStorage.getItem('hw_lang')||'ar';
+function t(k){return (T[lang]&&T[lang][k])||T.en[k]||k;}
+function $(i){return document.getElementById(i);}
+
+function setLang(l){
+  lang=l;localStorage.setItem('hw_lang',l);
+  document.documentElement.lang=l;
+  document.documentElement.dir=(l=='ar')?'rtl':'ltr';
+  document.title=t('title');
+  document.querySelectorAll('.langs button').forEach(function(b){b.className=(b.dataset.lang==l)?'on':'';});
+  document.querySelectorAll('.tile').forEach(function(b){b.textContent=t(b.dataset.tool);});
+  document.querySelectorAll('[data-back]').forEach(function(b){b.textContent='← '+t('back');});
+  document.querySelectorAll('[data-k]').forEach(function(e){e.textContent=t(e.dataset.k);});
+  $('calcGo').textContent=t('go');$('calcClr').textContent=t('clr');$('calcIn').placeholder=t('calcPh');
+  $('pGo1').textContent=t('p1');$('pGo2').textContent=t('p2');$('pGo3').textContent=t('p3');
+  $('tStart').textContent=t('start');$('tReset').textContent=t('reset');
+  $('tdAdd').textContent=t('add');$('tdIn').placeholder=t('tdPh');
+  $('dNames').placeholder=t('dPh');$('dGo').textContent=t('dGo');
+  fillConv();renderTodo();
+}
+
+function show(id){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
+  $('home').style.display=id?'none':'grid';
+  if(id)$(id).classList.add('on');
+}
+
+// الحاسبة
+function calc(){
+  var e=$('calcIn').value.replace(/%/g,'/100').replace(/×/g,'*').replace(/÷/g,'/');
+  if(!/^[0-9+\-*/().\s]*$/.test(e)||!e.trim()){$('calcOut').textContent='Error';return;}
+  try{var r=Function('return ('+e+')')();$('calcOut').textContent=(Math.round(r*1e10)/1e10);}
+  catch(x){$('calcOut').textContent='Error';}
+}
+
+// النسبة
+function pctCalc(mode){
+  var a=parseFloat($('pA').value),b=parseFloat($('pB').value),r;
+  if(isNaN(a)||isNaN(b)){$('pOut').textContent='—';return;}
+  if(mode==1)r=a*b/100;
+  else if(mode==2)r=a/b*100;
+  else r=b+b*a/100;
+  $('pOut').textContent=(Math.round(r*1e6)/1e6)+(mode==2?' %':'');
+}
+
+// التحويل
+var UNITS={
+  len:{m:1,km:1000,cm:0.01,mi:1609.344,ft:0.3048},
+  wt:{kg:1,g:0.001,lb:0.45359237,oz:0.028349523125},
+  tmp:{c:1,f:1,k:1}
+};
+function fillConv(){
+  var cat=$('cCat'),cur=cat.value||'len';
+  cat.innerHTML='';
+  [['len','len'],['wt','wt'],['tmp','tmp']].forEach(function(x){
+    var o=document.createElement('option');o.value=x[0];o.textContent=t(x[1]);cat.appendChild(o);
+  });
+  cat.value=cur;
+  var f=$('cFrom'),to=$('cTo'),fv=f.value,tv=to.value;
+  f.innerHTML='';to.innerHTML='';
+  Object.keys(UNITS[cat.value]).forEach(function(u){
+    var a=document.createElement('option');a.value=u;a.textContent=t(u);f.appendChild(a);
+    var b=document.createElement('option');b.value=u;b.textContent=t(u);to.appendChild(b);
+  });
+  if(fv)f.value=fv;if(tv)to.value=tv;
+  convert();
+}
+function toC(v,u){return u=='f'?(v-32)*5/9:u=='k'?v-273.15:v;}
+function fromC(v,u){return u=='f'?v*9/5+32:u=='k'?v+273.15:v;}
+function convert(){
+  var cat=$('cCat').value,from=$('cFrom').value,to=$('cTo').value,v=parseFloat($('cVal').value);
+  if(isNaN(v)){$('cOut').textContent='—';return;}
+  var r;
+  if(cat=='tmp')r=fromC(toC(v,from),to);
+  else r=v*UNITS[cat][from]/UNITS[cat][to];
+  $('cOut').textContent=Math.round(r*1e6)/1e6;
+}
+
+// المؤقت
+var tId=null,tLeft=0;
+function tShow(){var m=Math.floor(tLeft/60),s=tLeft%60;$('tDisp').textContent=('0'+m).slice(-2)+':'+('0'+s).slice(-2);}
+function tStart(){
+  if(tId){clearInterval(tId);tId=null;$('tStart').textContent=t('start');return;}
+  if(!tLeft){tLeft=parseInt($('tMin').value||0)*60+parseInt($('tSec').value||0);}
+  if(tLeft<=0)return;
+  $('tStart').textContent=t('pause');
+  tShow();
+  tId=setInterval(function(){
+    tLeft--;tShow();
+    if(tLeft<=0){clearInterval(tId);tId=null;$('tStart').textContent=t('start');
+      if(navigator.vibrate)navigator.vibrate([400,200,400]);alert(t('done'));}
+  },1000);
+}
+function tReset(){clearInterval(tId);tId=null;tLeft=0;tShow();$('tStart').textContent=t('start');}
+
+// المهام
+function getTodos(){try{return JSON.parse(localStorage.getItem('hw_todo')||'[]');}catch(e){return [];}}
+function saveTodos(l){localStorage.setItem('hw_todo',JSON.stringify(l));}
+function renderTodo(){
+  var l=getTodos(),h='';
+  l.forEach(function(x,i){
+    h+='<div class="item'+(x.d?' done':'')+'"><input type="checkbox" style="width:auto" '+(x.d?'checked':'')+' onchange="togTodo('+i+')"><span>'+esc(x.t)+'</span><button class="btn g" onclick="delTodo('+i+')">×</button></div>';
+  });
+  $('tdList').innerHTML=h;
+}
+function addTodo(){
+  var v=$('tdIn').value.trim();if(!v)return;
+  var l=getTodos();l.push({t:v,d:false});saveTodos(l);$('tdIn').value='';renderTodo();
+}
+function togTodo(i){var l=getTodos();l[i].d=!l[i].d;saveTodos(l);renderTodo();}
+function delTodo(i){var l=getTodos();l.splice(i,1);saveTodos(l);renderTodo();}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+// القرعة
+function drawPick(){
+  var names=$('dNames').value.split('\n').map(function(x){return x.trim();}).filter(Boolean);
+  if(!names.length){$('dOut').textContent=t('empty');return;}
+  var w=names[Math.floor(Math.random()*names.length)];
+  $('dOut').textContent=t('win')+' '+w;
+}
+
+// ربط الأحداث
+document.querySelectorAll('.langs button').forEach(function(b){b.onclick=function(){setLang(b.dataset.lang);};});
+document.querySelectorAll('.tile').forEach(function(b){b.onclick=function(){show(b.dataset.tool);};});
+document.querySelectorAll('[data-back]').forEach(function(b){b.onclick=function(){show(null);};});
+$('calcGo').onclick=calc;
+$('calcClr').onclick=function(){$('calcIn').value='';$('calcOut').textContent='0';};
+$('pGo1').onclick=function(){pctCalc(1);};
+$('pGo2').onclick=function(){pctCalc(2);};
+$('pGo3').onclick=function(){pctCalc(3);};
+$('cCat').onchange=fillConv;
+$('cFrom').onchange=convert;$('cTo').onchange=convert;$('cVal').oninput=convert;
+$('tStart').onclick=tStart;$('tReset').onclick=tReset;
+$('tdAdd').onclick=addTodo;
+$('dGo').onclick=drawPick;
+setLang(lang);
+tShow();
+</script>
 </body>
 </html>

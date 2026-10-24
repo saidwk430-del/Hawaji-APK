@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setAllowFileAccess(true);
         s.setGeolocationEnabled(true);
+        s.setMediaPlaybackRequiresUserGesture(false);
         web.addJavascriptInterface(new MedBridge(this), "Android");
         web.setWebViewClient(new WebViewClient());
         web.setWebChromeClient(new WebChromeClient() {
@@ -50,7 +51,11 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (web.canGoBack()) web.goBack();
-        else super.onBackPressed();
+        web.evaluateJavascript("(function(){return window.hBack?window.hBack():false})()", new android.webkit.ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String v) {
+                if (!"true".equals(v)) MainActivity.super.onBackPressed();
+            }
+        });
     }
 }

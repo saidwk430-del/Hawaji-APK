@@ -37,7 +37,8 @@ function rate(){sub('تقييم التطبيق','<div class="big" id="zst" style
 var r=parseInt(g('rate','0'))||0;
 function dr(){$('zst').innerHTML=[1,2,3,4,5].map(function(i){return '<span data-i="'+i+'">'+(i<=r?'★':'☆')+'</span>'}).join('');[].forEach.call($('zst').children,function(e){e.onclick=function(){r=+e.getAttribute('data-i');s('rate',r);dr()}});$('zrm').textContent=r?'شكراً لتقييمك: '+r+' من 5':'اضغط على النجوم'}dr()}
 function share(){var t='جرّب تطبيق Hawaji: مواقيت الصلاة، القبلة، المسبحة، الحاسبة وأدوات كثيرة في مكان واحد.';try{if(window.HShare){HShare.share(t);return}}catch(e){}try{navigator.share({text:t})}catch(e){}}
-function contact(){sub('التواصل مع المطور','<select id="zk"><option>اقتراح</option><option>ملاحظة</option><option>إبلاغ عن مشكلة</option></select><textarea id="zx" rows="7" placeholder="اكتب رسالتك هنا"></textarea><button id="zg">إرسال</button><div class="nt" id="zq"></div>');
+function contact(){sub('التواصل مع المطور','<button id="zf" style="width:100%;height:60px;font-size:18px">تواصل عبر فيسبوك</button><div class="nt">أو اكتب رسالتك:</div><select id="zk"><option>اقتراح</option><option>ملاحظة</option><option>إبلاغ عن مشكلة</option></select><textarea id="zx" rows="7" placeholder="اكتب رسالتك هنا"></textarea><button id="zg">إرسال</button><div class="nt" id="zq"></div>');
+$('zf').onclick=function(){location.href='https://www.facebook.com/scnsx1oay6'};
 $('zg').onclick=function(){var m=$('zx').value.trim();if(!m){$('zq').textContent='اكتب رسالتك أولاً';return}
 var sj='Hawaji - '+$('zk').value,bd=m+'\n\n(Hawaji v2.0 '+((navigator.userAgent.match(/Android [\d.]+/)||[''])[0])+')';
 if(MAIL){location.href='mailto:'+MAIL+'?subject='+encodeURIComponent(sj)+'&body='+encodeURIComponent(bd)}else{try{HShare.share(sj+'\n\n'+bd)}catch(e){$('zq').textContent='لم يُضبط بريد المطور بعد'}}}}

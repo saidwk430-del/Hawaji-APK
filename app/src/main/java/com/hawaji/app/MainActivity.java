@@ -26,7 +26,17 @@ public class MainActivity extends Activity {
         s.setGeolocationEnabled(true);
         s.setMediaPlaybackRequiresUserGesture(false);
         web.addJavascriptInterface(new MedBridge(this), "Android");
-        web.setWebViewClient(new WebViewClient());
+        web.addJavascriptInterface(new Sh(), "HShare");
+        web.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView v, String u) {
+                if (u.startsWith("file:")) return false;
+                try {
+                    startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u)));
+                } catch (Exception e) {}
+                return true;
+            }
+        });
         web.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -57,5 +67,28 @@ public class MainActivity extends Activity {
                 if (!"true".equals(v)) MainActivity.super.onBackPressed();
             }
         });
+    }
+
+    public class Sh {
+        @android.webkit.JavascriptInterface
+        public void share(final String t) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                    i.setType("text/plain");
+                    i.putExtra(android.content.Intent.EXTRA_TEXT, t);
+                    startActivity(android.content.Intent.createChooser(i, null));
+                }
+            });
+        }
+        @android.webkit.JavascriptInterface
+        public void copy(final String t) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    android.content.ClipboardManager c = (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    c.setPrimaryClip(android.content.ClipData.newPlainText("Hawaji", t));
+                }
+            });
+        }
     }
 }

@@ -81,7 +81,7 @@ function ensure(){
 }
 var _prevMq=setLang;
 setLang=function(l){_prevMq(l);ensure();};
-ensure();
+window.ensureMq=ensure;ensure();
 })();
 (function(){
 function addIslamic(){

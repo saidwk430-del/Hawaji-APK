@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
     private WebView web;
     private PdfBridge pdf;
+    private QuranAudio qa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,8 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Sh(), "HShare");
         pdf = new PdfBridge(this, web);
         web.addJavascriptInterface(pdf, "HPdf");
+        qa = new QuranAudio(this, web);
+        web.addJavascriptInterface(qa, "HAudio");
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, String u) {
@@ -67,6 +70,7 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
         if (req == PdfBridge.REQ) pdf.onPicked(res, data);
+        else if (req == QuranAudio.REQ) qa.onPicked(res, data);
     }
 
     @Override

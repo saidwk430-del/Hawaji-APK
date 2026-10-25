@@ -83,3 +83,20 @@ var _prevMq=setLang;
 setLang=function(l){_prevMq(l);ensure();};
 ensure();
 })();
+(function(){
+function addIslamic(){
+  var sec=document.querySelectorAll('#m_g_rel, [id^="m_"]');
+  var grid=null;
+  document.querySelectorAll('.grid').forEach(function(g){
+    if(g.querySelector('#go_qb')||g.querySelector('[id="go_pa"]')||g.querySelector('[id="go_dh"]'))grid=g;
+  });
+  if(!grid)grid=document.querySelector('#m_g_rel .grid');
+  if(!grid||document.getElementById('go_mq2'))return;
+  var b=document.createElement('button');b.className='tile';b.id='go_mq2';
+  b.textContent='القرآن بصوت ماهر';
+  b.onclick=function(){show('t_mq');if(window.hMqScan)hMqScan();};
+  grid.appendChild(b);
+}
+setTimeout(addIslamic,300);
+var _p=window.setLang;
+})();

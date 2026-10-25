@@ -47,7 +47,7 @@ window.hMqEnd=function(n){
 window.hMqScan=function(){refresh();draw();info();};
 function labels(){
   $('bt_mq').textContent=L('← رجوع','← Back','← Retour');
-  $('mqT').textContent=L('القرآن بصوت ماهر','Quran (Maher)','Coran (Maher)');
+  $('mqT').textContent=L('القرآن الكريم','Holy Quran','Le Saint Coran');$('mqR').textContent=L('القارئ: ماهر المعيقلي','Reciter: Maher Al-Muaiqly','Récitant : Maher Al-Muaiqly');
   $('mqPick').textContent=L('اختيار مجلد السور','Choose surahs folder','Choisir le dossier');
   $('mqPrev').textContent='⏮';$('mqNext').textContent='⏭';
 }
@@ -55,11 +55,11 @@ function ensure(){
   var m=$('m_g_rel');if(!m)return;
   var grid=m.querySelector('.grid');if(!grid)return;
   if(!$('go_mq')){var b=document.createElement('button');b.className='tile';b.id='go_mq';grid.appendChild(b);}
-  $('go_mq').textContent=L('القرآن بصوت ماهر','Quran (Maher)','Coran (Maher)');
+  $('go_mq').textContent=L('القرآن الكريم','Holy Quran','Le Saint Coran');
   $('go_mq').onclick=function(){show('t_mq');refresh();draw();info();};
   if(!$('t_mq')){
     var p=document.createElement('div');p.id='t_mq';p.className='panel';
-    p.innerHTML='<button class="back" id="bt_mq"></button><h2 id="mqT"></h2>'+
+    p.innerHTML='<button class="back" id="bt_mq"></button><h2 id="mqT"></h2><div class="note" id="mqR"></div>'+
       '<div class="row"><button class="btn g" id="mqPick"></button></div>'+
       '<div class="out" id="mqInfo"></div>'+
       '<div class="row"><button class="btn g" id="mqPrev"></button><button class="btn" id="mqPlay"></button><button class="btn g" id="mqNext"></button></div>'+

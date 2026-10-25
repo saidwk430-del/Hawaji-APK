@@ -23,7 +23,7 @@ function split(){ov('تقسيم الفاتورة','<div class="r">المبلغ<i
 function o(k){return function(){var t=document.querySelector('[data-tool="'+k+'"]');if(t)t.click()}}
 function sp(){var f=document.createElement('div');f.className='tile';f.textContent='الرياضة';f.style.display='none';document.body.appendChild(f);f.click();f.remove()}
 var G=[
-['الصلاة والعبادة','a','moon',[['اتجاه القبلة','compass',qibla,'g'],['القرآن بصوت ماهر','book',function(){show('t_mq');if(window.hMqScan)hMqScan();},'p'],['مواقيت الصلاة','clock',prayer,'b'],['المسبحة الإلكترونية','plus',tasbih,'k'],['الأذكار','list',adhkar,'a'],['حاسبة الزكاة','coin',zakat,'g']]],
+['الصلاة والعبادة','a','moon',[['اتجاه القبلة','compass',qibla,'g'],['القرآن الكريم','book',function(){mqOpen();},'p'],['مواقيت الصلاة','clock',prayer,'b'],['المسبحة الإلكترونية','plus',tasbih,'k'],['الأذكار','list',adhkar,'a'],['حاسبة الزكاة','coin',zakat,'g']]],
 ['الصحة واللياقة','r','act',[['الرياضة والتمارين','act',sp,'r'],['شرب الماء','drop',water,'b'],['متابعة الوزن','scale',weight,'b']]],
 ['الأدوات اليومية','p','calc',[['الآلة الحاسبة','calc',o('calc'),'a'],['النسبة المئوية','pct',o('pct'),'g'],['تحويل الوحدات','conv',o('conv'),'b'],['القرعة','dice',o('draw'),'k']]],
 ['الوقت والمهام','b','timer',[['المؤقت','timer',o('timer'),'p'],['المهام','check',o('todo'),'g']]],

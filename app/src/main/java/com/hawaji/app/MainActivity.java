@@ -2,6 +2,7 @@ package com.hawaji.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
     private WebView web;
+    private PdfBridge pdf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +29,14 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         web.addJavascriptInterface(new MedBridge(this), "Android");
         web.addJavascriptInterface(new Sh(), "HShare");
+        pdf = new PdfBridge(this, web);
+        web.addJavascriptInterface(pdf, "HPdf");
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView v, String u) {
                 if (u.startsWith("file:")) return false;
                 try {
-                    startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u)));
+                    startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(u)));
                 } catch (Exception e) {}
                 return true;
             }
@@ -60,6 +64,12 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req == PdfBridge.REQ) pdf.onPicked(res, data);
+    }
+
+    @Override
     public void onBackPressed() {
         web.evaluateJavascript("(function(){return window.hBack?window.hBack():false})()", new android.webkit.ValueCallback<String>() {
             @Override
@@ -74,10 +84,10 @@ public class MainActivity extends Activity {
         public void share(final String t) {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                    Intent i = new Intent(Intent.ACTION_SEND);
                     i.setType("text/plain");
-                    i.putExtra(android.content.Intent.EXTRA_TEXT, t);
-                    startActivity(android.content.Intent.createChooser(i, null));
+                    i.putExtra(Intent.EXTRA_TEXT, t);
+                    startActivity(Intent.createChooser(i, null));
                 }
             });
         }

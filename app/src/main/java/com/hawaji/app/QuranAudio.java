@@ -1,75 +1,65 @@
 package com.hawaji.app;
 
+import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
+import android.os.Build;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import androidx.documentfile.provider.DocumentFile;
+import java.io.File;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QuranAudio {
     static final int REQ = 8;
+    static final int PERM = 9;
+    static final String DIR = "/storage/emulated/0/Music/Telegram/Hawaji-Quran";
     private static final Pattern P = Pattern.compile("^(\\d{1,3}).*\\.mp3$", Pattern.CASE_INSENSITIVE);
     private final Activity act;
     private final WebView web;
-    private final TreeMap<Integer, Uri> files = new TreeMap<>();
+    private final TreeMap<Integer, String> files = new TreeMap<>();
     private MediaPlayer mp;
 
     QuranAudio(Activity a, WebView w) { act = a; web = w; }
 
+    private String perm() {
+        return Build.VERSION.SDK_INT >= 33 ? Manifest.permission.READ_MEDIA_AUDIO : Manifest.permission.READ_EXTERNAL_STORAGE;
+    }
+
+    private boolean hasPerm() {
+        return act.checkSelfPermission(perm()) == PackageManager.PERMISSION_GRANTED;
+    }
+
     @JavascriptInterface
-    public void pick() {
+    public void ask() {
+        if (hasPerm()) return;
         act.runOnUiThread(new Runnable() {
-            public void run() {
-                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-                act.startActivityForResult(i, REQ);
-            }
+            public void run() { act.requestPermissions(new String[]{perm()}, PERM); }
         });
     }
 
-    void onPicked(int res, Intent data) {
-        if (res != Activity.RESULT_OK || data == null || data.getData() == null) return;
-        Uri tree = data.getData();
-        try {
-            act.getContentResolver().takePersistableUriPermission(tree, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } catch (Exception e) {}
-        act.getSharedPreferences("hw", Context.MODE_PRIVATE).edit().putString("mq_tree", tree.toString()).apply();
-        scan(tree);
-        js("if(window.hMqScan)hMqScan()");
-    }
+    void onPicked(int res, Intent data) { }
 
-    private void scan(Uri tree) {
+    private void scan() {
         files.clear();
-        try {
-            DocumentFile d = DocumentFile.fromTreeUri(act, tree);
-            if (d == null) return;
-            for (DocumentFile f : d.listFiles()) {
-                String n = f.getName();
-                if (n == null) continue;
-                Matcher m = P.matcher(n);
-                if (m.find()) {
-                    int k = Integer.parseInt(m.group(1));
-                    if (k >= 1 && k <= 114) files.put(k, f.getUri());
-                }
+        if (!hasPerm()) return;
+        File[] fs = new File(DIR).listFiles();
+        if (fs == null) return;
+        for (File f : fs) {
+            Matcher m = P.matcher(f.getName());
+            if (m.find()) {
+                int k = Integer.parseInt(m.group(1));
+                if (k >= 1 && k <= 114) files.put(k, f.getAbsolutePath());
             }
-        } catch (Exception e) {}
-    }
-
-    private void ensureScanned() {
-        if (!files.isEmpty()) return;
-        String s = act.getSharedPreferences("hw", Context.MODE_PRIVATE).getString("mq_tree", null);
-        if (s != null) scan(Uri.parse(s));
+        }
     }
 
     @JavascriptInterface
     public synchronized String list() {
-        ensureScanned();
+        scan();
         StringBuilder b = new StringBuilder("[");
         boolean first = true;
         for (Integer k : files.keySet()) {
@@ -81,24 +71,22 @@ public class QuranAudio {
     }
 
     @JavascriptInterface
-    public synchronized boolean play(int n) {
-        ensureScanned();
-        Uri u = files.get(n);
-        if (u == null) return false;
-        stopPlayer();
+    public synchronized boolean play(final int n) {
+        if (files.isEmpty()) scan();
+        String p = files.get(n);
+        if (p == null) return false;
+        release();
         try {
             mp = new MediaPlayer();
-            mp.setDataSource(act, u);
+            mp.setDataSource(p);
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer p) {
-                    js("if(window.hMqEnd)hMqEnd(" + n + ")");
-                }
+                public void onCompletion(MediaPlayer x) { js("if(window.hMqEnd)hMqEnd(" + n + ")"); }
             });
             mp.prepare();
             mp.start();
             return true;
         } catch (Exception e) {
-            stopPlayer();
+            release();
             return false;
         }
     }
@@ -114,9 +102,24 @@ public class QuranAudio {
     }
 
     @JavascriptInterface
-    public synchronized void stop() { stopPlayer(); }
+    public synchronized int pos() {
+        try { return mp != null ? mp.getCurrentPosition() : 0; } catch (Exception e) { return 0; }
+    }
 
-    private void stopPlayer() {
+    @JavascriptInterface
+    public synchronized int dur() {
+        try { return mp != null ? mp.getDuration() : 0; } catch (Exception e) { return 0; }
+    }
+
+    @JavascriptInterface
+    public synchronized void seek(int ms) {
+        try { if (mp != null) mp.seekTo(ms); } catch (Exception e) {}
+    }
+
+    @JavascriptInterface
+    public synchronized void stop() { release(); }
+
+    private void release() {
         try {
             if (mp != null) {
                 mp.setOnCompletionListener(null);
